@@ -17,6 +17,8 @@ const vm = createApp(Popup).mount(mountEl);
 const recordButton = <HTMLElement>document.getElementById('record');
 const endButton = <HTMLElement>document.getElementById('end');
 
+var z = document.createElement('a');
+
 let stream: MediaStream;
 let audioStream: MediaStream;
 
@@ -83,17 +85,18 @@ async function finishCapture(blob: Blob) {
     try {
         // stop recording 
         stream.getTracks().forEach(track => track.stop()); // stop capturing
-        let form = new FormData();
-        form.append('video', blob, `screen-capture-${Date.now()}.webm`);
-        const response = await window.fetch('https://tgonz.work/hispana/public/subirVideo/', {
-            method: 'POST',
-            body: form
-        });
-        let res = await response.json();
-        alert(JSON.stringify(res));
+
+        let downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = `screen-capture-${Date.now()}.webm`;
+
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+
+        document.body.removeChild(downloadLink);
     } catch (error) {
         console.log(error)
-    } 
+    }
 }
 
 
